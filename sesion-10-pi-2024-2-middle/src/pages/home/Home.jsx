@@ -6,7 +6,7 @@ import Beach from "./world/Beach";
 import Staging from "./staging/Staging";
 import { Loader, PositionalAudio } from "@react-three/drei";
 import { Perf } from "r3f-perf";
-import { Suspense, useCallback, useRef, useEffect } from "react";
+import { Suspense, useCallback, useRef, useEffect, useState } from "react";
 import Video from "./world/Video";
 
 const Home = () => {
@@ -15,22 +15,18 @@ const Home = () => {
   };
 
   const audioRef = useRef(null);
-  
-  // Use effect to play audio when the component is mounted
-  useEffect(() => {
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  const handleToggleAudio = useCallback(() => {
     if (audioRef.current) {
-      const audio = audioRef.current;
-      const playAudio = async () => {
-        try {
-          await audio.play(); // Attempt to play audio
-          audio.setVolume(10);
-        } catch (err) {
-          console.log("Audio auto-play was prevented:", err);
-        }
-      };
-      playAudio();
+      if (isPlaying) {
+        audioRef.current.pause(); // Pausar el audio si está reproduciendo
+      } else {
+        audioRef.current.play(); // Reproducir el audio si está en pausa
+      }
+      setIsPlaying(!isPlaying); // Actualizar el estado
     }
-  }, []);
+  }, [isPlaying]);
 
   return (
     <>
@@ -54,6 +50,22 @@ const Home = () => {
         </Suspense>
       </Canvas>
       <Loader />
+      {/* Botón de reproducir/pausar audio */}
+      <button
+        onClick={handleToggleAudio}
+        style={{
+          position: "absolute",
+          top: "10px",
+          right: "10px", // Cambiado "left" por "right" para posicionarlo a la derecha
+          padding: "10px",
+          backgroundColor: "white",
+          border: "none",
+          borderRadius: "5px",
+          cursor: "pointer",
+        }}
+      >
+        {isPlaying ? "Apagar Sonido" : "Prender Sonido"}
+      </button>
     </>
   );
 };
